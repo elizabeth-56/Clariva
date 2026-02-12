@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dyslexia Friendly Reader</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#FDFCF8;
+  --text:#2C2C24;
+  --moss:#5D7052;
+  --clay:#C18C5D;
+  --sand:#E6DCCD;
+  --border:#DED8CF;
+  --muted:#78786C;
+
+  --radius:24px;
+  --shadow:0 10px 30px -10px rgba(93,112,82,0.2);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Nunito",sans-serif;
+  line-height:1.6;
+}
+
+/* subtle grain */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:url("https://grainy-gradients.vercel.app/noise.svg");
+  opacity:0.04;
+  pointer-events:none;
+}
+
+/* layout */
+section{
+  padding:100px 20px;
+  display:flex;
+  justify-content:center;
+}
+
+.container{
+  max-width:1100px;
+  width:100%;
+}
+
+/* HERO */
+.hero{
+  display:grid;
+  gap:60px;
+  align-items:center;
+}
+
+@media(min-width:900px){
+  .hero{
+    grid-template-columns:1fr 420px;
+  }
+}
+
+h1,h2{
+  font-family:"Fraunces",serif;
+}
+
+h1{
+  font-size:48px;
+  margin-bottom:20px;
+}
+
+p.lead{
+  color:var(--muted);
+  max-width:520px;
+}
+
+/* LOGIN CARD */
+.card{
+  background:#FEFEFA;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:40px;
+  box-shadow:var(--shadow);
+}
+
+input{
+  width:100%;
+  height:64px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  padding:0 16px;
+  margin-top:12px;
+}
+
+button{
+  width:100%;
+  height:48px;
+  border:none;
+  border-radius:999px;
+  margin-top:16px;
+  background:var(--moss);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+/* FEATURES */
+.features{
+  display:grid;
+  gap:30px;
+}
+
+@media(min-width:768px){
+  .features{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+.feature{
+  background:#FEFEFA;
+  border:1px solid var(--border);
+  border-radius:40px 24px 40px 24px;
+  padding:30px;
+  box-shadow:var(--shadow);
+  transition:.3s;
+}
+
+.feature:hover{
+  transform:translateY(-6px);
+}
+
+.feature img{
+  width:60px;
+  margin-bottom:16px;
+}
+
+/* STATS */
+.stats{
+  display:grid;
+  gap:24px;
+}
+
+@media(min-width:768px){
+  .stats{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+.stat{
+  background:var(--sand);
+  border-radius:var(--radius);
+  padding:30px;
+  text-align:center;
+}
+
+.stat h3{
+  font-size:32px;
+  color:var(--moss);
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:40px 20px;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<!-- HERO + LOGIN -->
+<section>
+  <div class="container hero">
+
+    <div>
+      <h1>A calmer way to read.</h1>
+      <p class="lead">
+        Designed with dyslexia-friendly typography, gentle colors,
+        and personalized spacing to make reading comfortable,
+        focused, and welcoming.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Log in</h2>
+      <input type="email" placeholder="Email"/>
+      <input type="password" placeholder="Password"/>
+      <button>Continue</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section>
+  <div class="container">
+
+    <h2 style="margin-bottom:40px;">Thoughtful reading tools</h2>
+
+    <div class="features">
+
+      <div class="feature">
+        <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png"/>
+        <h3>Readable fonts</h3>
+        <p>Carefully chosen sans-serif typography improves clarity and reduces visual strain.</p>
+      </div>
+
+      <div class="feature">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png"/>
+        <h3>Soft color themes</h3>
+        <p>Off-white paper tones and gentle contrast create a calm reading environment.</p>
+      </div>
+
+      <div class="feature">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828919.png"/>
+        <h3>Personal spacing</h3>
+        <p>Adjust line, word, and letter spacing to match individual reading comfort.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- DYSLEXIA INFO -->
+<section>
+  <div class="container">
+
+    <h2 style="margin-bottom:40px;">Why this matters</h2>
+
+    <div class="stats">
+      <div class="stat">
+        <h3>10–15%</h3>
+        <p>of people worldwide experience dyslexia-related reading differences.</p>
+      </div>
+
+      <div class="stat">
+        <h3>Better contrast</h3>
+        <p>Soft backgrounds with dark text improve readability and reduce fatigue.</p>
+      </div>
+
+      <div class="stat">
+        <h3>Personalization helps</h3>
+        <p>Custom fonts and spacing significantly improve reading comfort.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  © Dyslexia Friendly Reader • Mini Project
+</footer>
+
+</body>
+</html>

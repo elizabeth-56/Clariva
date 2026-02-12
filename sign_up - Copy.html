@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dyslexia Friendly Reader – Login</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Lexend",sans-serif;
+}
+
+body{
+  background:linear-gradient(135deg,#dbeafe,#fce7f3);
+  color:#333;
+}
+
+/* ---------- HERO LOGIN SECTION ---------- */
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px;
+}
+
+.card{
+  width:1000px;
+  background:white;
+  border-radius:25px;
+  display:flex;
+  overflow:hidden;
+  box-shadow:0 20px 50px rgba(0,0,0,0.15);
+}
+
+/* LEFT LOGIN */
+.login{
+  flex:1;
+  padding:60px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.logo{
+  color:#ec4899;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+h1{
+  font-size:40px;
+  margin-bottom:25px;
+}
+
+.input{
+  margin-bottom:15px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #cbd5e1;
+  font-size:14px;
+}
+
+button{
+  margin-top:10px;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#f472b6;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+button:hover{
+  background:#db2777;
+}
+
+/* RIGHT ILLUSTRATION AREA */
+.visual{
+  flex:1;
+  background:#bfdbfe;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+/* simple friendly reading character */
+.reader{
+  width:140px;
+  height:180px;
+  background:#fde68a;
+  border-radius:70px 70px 40px 40px;
+  position:relative;
+}
+
+.book{
+  width:120px;
+  height:70px;
+  background:white;
+  position:absolute;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  border-radius:10px;
+  box-shadow:0 5px 10px rgba(0,0,0,0.1);
+}
+
+.eye{
+  width:10px;
+  height:10px;
+  background:#000;
+  border-radius:50%;
+  position:absolute;
+  top:55px;
+}
+
+.eye.left{ left:45px; }
+.eye.right{ right:45px; }
+
+.smile{
+  width:40px;
+  height:20px;
+  border:3px solid #000;
+  border-top:none;
+  border-radius:0 0 40px 40px;
+  position:absolute;
+  top:80px;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+/* ---------- SCROLL FACTS SECTION ---------- */
+.facts{
+  background:white;
+  padding:80px 20px;
+  text-align:center;
+}
+
+.facts h2{
+  font-size:32px;
+  margin-bottom:40px;
+  color:#1e3a8a;
+}
+
+.fact-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  max-width:900px;
+  margin:auto;
+}
+
+.fact{
+  background:#fef9c3;
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  font-size:15px;
+}
+
+/* smooth scroll hint */
+.scroll{
+  position:absolute;
+  bottom:15px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:13px;
+  opacity:.6;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN HERO -->
+<section class="hero">
+  <div class="card">
+
+    <!-- LEFT -->
+    <div class="login">
+      <div class="logo">Dyslexia Reader</div>
+      <h1>Welcome Back</h1>
+
+      <div class="input">
+        <input type="email" placeholder="Email address">
+      </div>
+
+      <div class="input">
+        <input type="password" placeholder="Password">
+      </div>
+
+      <button onclick="login()">Log In</button>
+    </div>
+
+    <!-- RIGHT VISUAL -->
+    <div class="visual">
+      <div class="reader">
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <div class="smile"></div>
+        <div class="book"></div>
+      </div>
+
+      <div class="scroll">scroll ↓ to learn more</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FACTS AFTER SCROLL -->
+<section class="facts">
+  <h2>Understanding Dyslexia</h2>
+
+  <div class="fact-grid">
+    <div class="fact">Dyslexia is a difference in how the brain processes written language, not a lack of intelligence.</div>
+    <div class="fact">Many successful scientists, artists, and entrepreneurs have dyslexia.</div>
+    <div class="fact">Supportive fonts, spacing, and colors can make reading more comfortable.</div>
+    <div class="fact">Listening to text while reading improves comprehension and confidence.</div>
+  </div>
+</section>
+
+<script>
+function login(){
+  alert("Backend connection comes next 😌");
+}
+</script>
+
+</body>
+</html>
