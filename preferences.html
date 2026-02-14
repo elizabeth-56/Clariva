@@ -1,191 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Typography Preference Manager</title>
-    <style>
-        :root {
-            /* Variables updated by JS */
-            --bg-color: #f5f5dc; /* beige */
-            --text-color: #000000;
-            --font-family: 'Arial';
-            --font-size: 16px;
-            --line-height: 1.5;
-            --letter-spacing: 1.6px;
-            --word-spacing: 3.2px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dyslexia-Friendly Text Formatter</title>
 
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
-        /* Preference Sidebar */
-        #pref-sidebar {
-            width: 350px;
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 25px;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.2);
-            overflow-y: auto;
-            z-index: 100;
-        }
+  <style>
+    body {
+      margin: 0;
+      font-family: "Open Sans", Arial, sans-serif;
+      background: #f6f1e7;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
 
-        h2 { border-bottom: 2px solid #34495e; padding-bottom: 10px; margin-top: 0; }
+    h1 {
+      margin-top: 24px;
+      font-size: 28px;
+      text-align: center;
+    }
 
-        .control-group { margin-bottom: 20px; }
-        
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-size: 0.85rem; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #bdc3c7;
-        }
+    .container {
+      width: 92%;
+      max-width: 900px;
+      margin: 20px auto;
+      background: #fffdf7;
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+    }
 
-        select, input[type="range"] {
-            width: 100%;
-            padding: 10px;
-            background: #34495e;
-            color: white;
-            border: 1px solid #455a64;
-            border-radius: 4px;
-        }
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      border-radius: 14px;
+      border: 1px solid #ccc;
+      padding: 14px;
+      font-size: 16px;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 14px;
+      background: #fffef9;
+    }
 
-        .value-display {
-            float: right;
-            color: #1abc9c;
-            font-weight: bold;
-        }
+    .file-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
 
-        /* Preview Area */
-        #main-preview {
-            flex-grow: 1;
-            padding: 60px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            overflow-y: auto;
-            transition: background 0.3s, color 0.3s;
-        }
+    .file-actions input {
+      font-size: 13px;
+    }
 
-        .text-container {
-            max-width: 750px;
-            margin: 0 auto;
-            /* Applying the dynamic styles */
-            font-family: var(--font-family);
-            font-size: var(--font-size);
-            line-height: var(--line-height);
-            letter-spacing: var(--letter-spacing);
-            word-spacing: var(--word-spacing);
-            text-align: left;
-        }
-    </style>
+    .preview {
+      margin-top: 18px;
+      padding: 20px;
+      border-radius: 14px;
+      background: #fffbe6;
+      line-height: 1.5;
+      font-size: 18px;
+      min-height: 120px;
+      transition: all 0.25s ease;
+    }
+
+    /* Preferences dropdown */
+    .preferences {
+      margin-top: 20px;
+      border-top: 1px solid #e5e0d6;
+      padding-top: 16px;
+    }
+
+    details {
+      background: #faf6ee;
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+    }
+
+    summary {
+      font-weight: 600;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    label {
+      font-size: 13px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    select, input[type="range"] {
+      width: 100%;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    footer {
+      margin: 22px 0 12px;
+      font-size: 13px;
+      color: #666;
+      text-align: center;
+    }
+  </style>
 </head>
+
 <body>
+  <h1>Dyslexia-Friendly Text Formatter</h1>
 
-    <aside id="pref-sidebar">
-        <h2>Preferences</h2>
-        <div id="controls-root">
-            </div>
-    </aside>
+  <div class="container">
 
-    <main id="main-preview">
-        <article class="text-container">
-            <h1>Accessibility Preview</h1>
-            <p>This text updates in real-time as you adjust the preferences in the sidebar. The ranges for font size and line spacing are pulled directly from your JSON dataset.</p>
-            <p>Letter spacing and word spacing are currently calculated as percentages of the font size (10% and 20% respectively) to maintain visual harmony as you scale the text up or down.</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-        </article>
-    </main>
+    <!-- TEXT INPUT -->
+    <textarea id="inputText" placeholder="Paste text here, upload a PDF, or take a photo of text..."></textarea>
+
+    <!-- FILE / PHOTO OPTIONS -->
+    <div class="file-actions">
+      <input type="file" accept="image/*" capture="environment" />
+      <input type="file" accept="application/pdf" />
+    </div>
+
+    <!-- PREVIEW OUTPUT -->
+    <div id="preview" class="preview">
+      Your formatted text will appear here.
+    </div>
+
+    <!-- PREFERENCES DROPDOWN -->
+    <div class="preferences">
+      <details open>
+        <summary>Formatting Preferences</summary>
+
+        <div class="controls">
+
+          <div>
+            <label>Font Family</label>
+            <select id="fontFamily"></select>
+          </div>
+
+          <div>
+            <label>Font Size</label>
+            <input type="range" id="fontSize" min="12" max="26" value="16" />
+          </div>
+
+          <div>
+            <label>Line Spacing</label>
+            <select id="lineSpacing"></select>
+          </div>
+
+          <div>
+            <label>Background Color</label>
+            <select id="bgColor"></select>
+          </div>
+
+          <div>
+            <label>Text Color</label>
+            <select id="textColor"></select>
+          </div>
+
+          <div>
+            <label>Highlight Mode</label>
+            <select id="highlightMode"></select>
+          </div>
+
+        </div>
+      </details>
+    </div>
+
+  </div>
+
+  <footer>• Dyslexia Friendly Reader</footer>
 
 <script>
-    async function loadPreferences() {
-        try {
-            const response = await fetch('preference.json');
-            const data = await response.json();
-            buildUI(data);
-        } catch (e) {
-            console.error("Fetch error. Make sure preference.json exists and you are using a local server.", e);
-            document.getElementById('controls-root').innerHTML = "Error loading preference.json";
+const preview = document.getElementById("preview");
+const inputText = document.getElementById("inputText");
+
+let preferencesData = null;
+
+/* Load dataset */
+fetch("preference.json")
+  .then(res => res.json())
+  .then(data => {
+    preferencesData = data;
+
+    const fontSelect = document.getElementById("fontFamily");
+    const bgSelect = document.getElementById("bgColor");
+    const textSelect = document.getElementById("textColor");
+    const lineSelect = document.getElementById("lineSpacing");
+    const highlightSelect = document.getElementById("highlightMode");
+
+    data.font_family.forEach(font => {
+      fontSelect.add(new Option(font, font));
+    });
+
+    data.background_color.forEach(color => {
+      bgSelect.add(new Option(color, color));
+    });
+
+    data.foreground_color.forEach(color => {
+      textSelect.add(new Option(color, color));
+    });
+
+    [data.line_spacing.min, data.line_spacing.recommended, data.line_spacing.max]
+      .forEach(v => lineSelect.add(new Option(v, v)));
+
+    data.letter_highlighting.modes.forEach(mode => {
+      highlightSelect.add(new Option(mode.replaceAll("_"," "), mode));
+    });
+  });
+
+
+/* ---------- TEXT ANALYSIS ENGINE ---------- */
+
+function highlightText(text, mode) {
+  if (!preferencesData) return text;
+
+  const vowels = ["a","e","i","o","u","A","E","I","O","U"];
+
+  /* collect ALL confusing letters from dataset */
+  const confusingLetters = new Set(
+    Object.values(preferencesData.confusing_letter_groups)
+      .flat()
+      .map(String)
+  );
+
+  /* split into words but keep spaces */
+  const words = text.split(/(\s+)/);
+
+  const processed = words.map(word => {
+
+    /* FIRST LETTER BOLD */
+    if (mode === "first_letter_bold") {
+      return word.charAt(0)
+        ? `<strong>${word.charAt(0)}</strong>${word.slice(1)}`
+        : word;
+    }
+
+    /* VOWEL COLORING */
+    if (mode === "vowel_coloring") {
+      return word.split("").map(ch =>
+        vowels.includes(ch)
+          ? `<span style="color:#2a7fff;font-weight:600">${ch}</span>`
+          : ch
+      ).join("");
+    }
+
+    /* CONFUSING LETTERS */
+    if (mode === "confusing_letter_pairs") {
+      return word.split("").map(ch =>
+        confusingLetters.has(ch)
+          ? `<span style="background:#ffeaa7;padding:1px 2px;border-radius:3px">${ch}</span>`
+          : ch
+      ).join("");
+    }
+
+    /* FIRST SYLLABLE */
+    if (mode === "first_syllable_highlight") {
+      let seenVowel = false;
+
+      return word.split("").map(ch => {
+        if (!seenVowel) {
+          if (vowels.includes(ch)) seenVowel = true;
+          return `<span style="background:#c7f0ff">${ch}</span>`;
         }
+        return ch;
+      }).join("");
     }
 
-    function buildUI(data) {
-        const root = document.getElementById('controls-root');
-        root.innerHTML = ''; 
+    return word;
+  });
 
-        // 1. Font Family
-        addDropdown(root, "Font Family", data.font_family, (v) => updateVar('--font-family', v));
+  return processed.join("");
+}
 
-        // 2. Background Color
-        addDropdown(root, "Background", data.background_color, (v) => updateVar('--bg-color', v));
 
-        // 3. Foreground Color
-        addDropdown(root, "Text Color", data.forground_color, (v) => updateVar('--text-color', v.replace('dark-', '')));
+/* ---------- LIVE PREVIEW ---------- */
 
-        // 4. Font Size (Min/Max/Recommended)
-        addSlider(root, "Font Size", data.font_size.min, data.font_size.max, data.font_size.recommended, "px", (v) => {
-            updateVar('--font-size', v + 'px');
-            // Recalculate relative spacings when font size changes
-            updateRelativeSpacings(v, data.letter_spacing.recommended_percent, data.word_spacing.recommended_percent);
-        });
+function updatePreview() {
+  const mode = document.getElementById("highlightMode").value;
+  preview.innerHTML = highlightText(inputText.value, mode);
+}
 
-        // 5. Line Spacing (Min/Max/Recommended)
-        addSlider(root, "Line Spacing", data.line_spacing.min, data.line_spacing.max, data.line_spacing.recommended, "", (v) => {
-            updateVar('--line-height', v);
-        }, 0.1);
+inputText.addEventListener("input", updatePreview);
+document.getElementById("highlightMode").addEventListener("change", updatePreview);
 
-        // Initial application of spacing logic
-        updateRelativeSpacings(data.font_size.recommended, data.letter_spacing.recommended_percent, data.word_spacing.recommended_percent);
-        updateVar('--line-height', data.line_spacing.recommended);
-    }
 
-    function updateVar(name, val) {
-        document.documentElement.style.setProperty(name, val);
-    }
+/* ---------- STYLE CONTROLS ---------- */
 
-    function updateRelativeSpacings(fontSize, letPct, wordPct) {
-        const lSpc = (fontSize * letPct) / 100;
-        const wSpc = (fontSize * wordPct) / 100;
-        updateVar('--letter-spacing', lSpc + 'px');
-        updateVar('--word-spacing', wSpc + 'px');
-    }
+document.getElementById("fontFamily").addEventListener("change", e => {
+  preview.style.fontFamily = e.target.value;
+});
 
-    function addDropdown(parent, label, options, callback) {
-        const group = document.createElement('div');
-        group.className = 'control-group';
-        group.innerHTML = `<label>${label}</label>`;
-        const sel = document.createElement('select');
-        options.forEach(opt => {
-            const o = document.createElement('option');
-            o.value = opt; o.textContent = opt;
-            sel.appendChild(o);
-        });
-        sel.onchange = (e) => callback(e.target.value);
-        group.appendChild(sel);
-        parent.appendChild(group);
-    }
+document.getElementById("fontSize").addEventListener("input", e => {
+  preview.style.fontSize = e.target.value + "px";
+});
 
-    function addSlider(parent, label, min, max, initial, unit, callback, step = 1) {
-        const group = document.createElement('div');
-        group.className = 'control-group';
-        group.innerHTML = `
-            <label>${label} <span class="value-display" id="val-${label}">${initial}${unit}</span></label>
-            <input type="range" min="${min}" max="${max}" step="${step}" value="${initial}">
-        `;
-        const input = group.querySelector('input');
-        input.oninput = (e) => {
-            document.getElementById(`val-${label}`).textContent = e.target.value + unit;
-            callback(e.target.value);
-        };
-        parent.appendChild(group);
-    }
+document.getElementById("lineSpacing").addEventListener("change", e => {
+  preview.style.lineHeight = e.target.value;
+});
 
-    loadPreferences();
+document.getElementById("bgColor").addEventListener("change", e => {
+  preview.style.backgroundColor = e.target.value;
+});
+
+document.getElementById("textColor").addEventListener("change", e => {
+  preview.style.color = e.target.value;
+});
 </script>
 </body>
 </html>
