@@ -1,5 +1,5 @@
 {
-  "font_family": [
+  "font": [
     "Arial",
     "Verdana",
     "Tahoma",
@@ -23,7 +23,7 @@
   },
 
   "word_spacing": {
-    "max":0.1,
+    "min":0.1,
     "recommended":0.25,
     "max":0.35
   },
@@ -89,12 +89,14 @@
   },
 
   "user_preferences": {
-    "selected_font": "Open Sans",
+    "font": "Open Sans",
     "font_size": 16,
     "line_spacing": 1.5,
+    "letter_spacing":0.15,
+    "word_spacing":0.25,
     "background_color": "soft-cream",
     "text_color": "black",
-    "highlight_mode": "vowel_coloring",
+    "highlight_mode": "confusing_letter_groups",
 
     "custom_colors": {
       "vowels": null,

@@ -31,6 +31,9 @@
         #formatted-content {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        .zoom-in { animation: zoomIn 0.3s ease-out; }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body class="bg-[#E6F0FA] h-screen overflow-hidden flex flex-col">
@@ -64,12 +67,7 @@
                     <!-- Text rendered here -->
                 </div>
             </div>
-            
-            <div class="flex gap-2 justify-end mb-4">
-                <button id="simplify-btn" class="flex items-center gap-2 px-6 py-2.5 bg-white rounded-full text-blue-600 font-black text-sm shadow-md hover:bg-blue-50 border border-blue-100 transition-all active:scale-95">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i> SIMPLIFY ✨
-                </button>
-            </div>
+            <!-- Simplified: Removed Simplify Button container -->
         </div>
     </main>
 
@@ -108,13 +106,13 @@
         <input type="file" id="pdf-input" class="hidden" accept=".pdf">
         
         <div class="flex items-center gap-1 pr-2 border-r border-slate-100 text-slate-300">
-            <button id="pdf-trigger" class="p-2.5 hover:bg-slate-50 rounded-xl transition-colors">
+            <button id="pdf-trigger" class="p-2.5 hover:bg-slate-50 rounded-xl transition-colors" title="Attach PDF">
                 <i data-lucide="file-plus" class="text-blue-500 w-5 h-5"></i>
             </button>
-            <button id="camera-trigger" class="p-2.5 hover:bg-slate-50 rounded-xl transition-colors">
+            <button id="camera-trigger" class="p-2.5 hover:bg-slate-50 rounded-xl transition-colors" title="Scan Image">
                 <i data-lucide="camera" class="text-blue-500 w-5 h-5"></i>
             </button>
-            <button id="gallery-trigger" class="p-2.5 hover:bg-slate-50 rounded-xl transition-colors">
+            <button id="gallery-trigger" class="p-2.5 hover:bg-slate-50 rounded-xl transition-colors" title="Gallery">
                 <i data-lucide="image" class="text-blue-500 w-5 h-5"></i>
             </button>
         </div>
@@ -152,6 +150,8 @@
     </div>
 
     <script>
+        const apiKey = ""; // Environment provides key at runtime
+
         const DATASET = {
             "font": ["Arial", "Verdana", "Tahoma", "Century Gothic", "Trebuchet MS", "Calibri", "Open Sans", "Comic Sans MS"],
             "font_size": { "min": 12, "recommended": 16, "max": 26 },
@@ -211,9 +211,6 @@
         let inputText = "CLARIVA **\n\nSuccess is simple. Do your best.\n\nPremium Series\n\nBe Kind. Feel Good.\n\nNalanda";
         let activeTab = 'settings';
 
-        // Initialize Icons
-        lucide.createIcons();
-
         // Elements
         const textInput = document.getElementById('text-input');
         const formattedContent = document.getElementById('formatted-content');
@@ -223,12 +220,14 @@
         const talkModal = document.getElementById('talk-modal');
         const talkModalContent = document.getElementById('talk-modal-content');
         const statusSpan = document.getElementById('status-msg');
+        const aiLoader = document.getElementById('ai-loader');
+
+        // Initial Icon Render
+        lucide.createIcons();
 
         // Functions
         function renderText() {
             formattedContent.innerHTML = '';
-            
-            // Styles from preferences
             formattedContent.style.fontFamily = preferences.font;
             formattedContent.style.fontSize = preferences.font_size + 'px';
             formattedContent.style.lineHeight = preferences.line_spacing;
@@ -238,8 +237,7 @@
             formattedContent.style.backgroundColor = DATASET.background_colors[preferences.background_color];
 
             const words = inputText.split(/\s+/);
-            
-            words.forEach((word, wordIdx) => {
+            words.forEach((word) => {
                 if (!word) return;
                 const wordSpan = document.createElement('span');
                 wordSpan.className = 'inline-block';
@@ -249,28 +247,21 @@
                     const lowerChar = char.toLowerCase();
                     charSpan.textContent = char;
 
-                    // Bold Start
                     if (preferences.active_highlights.includes('first_letter_bold') && charIdx === 0) {
                         charSpan.style.fontWeight = '900';
                     }
-
-                    // Vowel Coloring
                     if (preferences.active_highlights.includes('vowel_coloring') && 'aeiou'.includes(lowerChar)) {
                         charSpan.style.color = DATASET.highlight_colors.vowels;
                         charSpan.style.fontWeight = 'bold';
                     }
-
-                    // Pair highlights
                     Object.entries(DATASET.confusing_letter_groups).forEach(([groupId, letters]) => {
                         if (preferences.active_confusing_groups.includes(groupId) && letters.includes(lowerChar)) {
                             charSpan.style.color = DATASET.highlight_colors[groupId];
                             charSpan.style.fontWeight = 'bold';
                         }
                     });
-
                     wordSpan.appendChild(charSpan);
                 });
-
                 formattedContent.appendChild(wordSpan);
                 formattedContent.appendChild(document.createTextNode(' '));
             });
@@ -279,13 +270,8 @@
         function switchTab(tabId) {
             activeTab = tabId;
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                if (btn.dataset.tab === tabId) {
-                    btn.classList.add('border-blue-600', 'text-blue-600');
-                    btn.classList.remove('border-transparent', 'text-slate-400');
-                } else {
-                    btn.classList.remove('border-blue-600', 'text-blue-600');
-                    btn.classList.add('border-transparent', 'text-slate-400');
-                }
+                const isActive = btn.dataset.tab === tabId;
+                btn.className = `tab-btn flex items-center gap-2 px-2 py-4 border-b-4 font-black text-xs tracking-widest transition-all ${isActive ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400'}`;
             });
             renderTabContent();
         }
@@ -296,7 +282,6 @@
             wrapper.className = 'space-y-10 animate-in fade-in zoom-in duration-300';
 
             if (activeTab === 'settings') {
-                const fontSection = createSection('Font Family');
                 const fontGrid = document.createElement('div');
                 fontGrid.className = 'grid grid-cols-2 gap-3';
                 DATASET.font.forEach(f => {
@@ -306,20 +291,16 @@
                     btn.onclick = () => { preferences.font = f; renderTabContent(); renderText(); };
                     fontGrid.appendChild(btn);
                 });
-                fontSection.appendChild(fontGrid);
-                wrapper.appendChild(fontSection);
+                wrapper.appendChild(createSection('Font Family', fontGrid));
 
                 const slidersGrid = document.createElement('div');
                 slidersGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-10';
-                
                 slidersGrid.appendChild(createSlider('Font Size', DATASET.font_size.min, DATASET.font_size.max, 1, preferences.font_size, (v) => { preferences.font_size = v; renderText(); }));
                 slidersGrid.appendChild(createSlider('Line Spacing', 1.2, 2.5, 0.1, preferences.line_spacing, (v) => { preferences.line_spacing = v; renderText(); }));
                 slidersGrid.appendChild(createSlider('Letter Spacing', 0.05, 0.3, 0.01, preferences.letter_spacing, (v) => { preferences.letter_spacing = v; renderText(); }));
                 slidersGrid.appendChild(createSlider('Word Spacing', 0.1, 0.5, 0.01, preferences.word_spacing, (v) => { preferences.word_spacing = v; renderText(); }));
-                
                 wrapper.appendChild(slidersGrid);
             } else if (activeTab === 'colors') {
-                const bgSection = createSection('Background');
                 const bgFlex = document.createElement('div');
                 bgFlex.className = 'flex gap-5 flex-wrap';
                 Object.entries(DATASET.background_colors).forEach(([name, hex]) => {
@@ -329,10 +310,8 @@
                     btn.onclick = () => { preferences.background_color = name; renderTabContent(); renderText(); };
                     bgFlex.appendChild(btn);
                 });
-                bgSection.appendChild(bgFlex);
-                wrapper.appendChild(bgSection);
+                wrapper.appendChild(createSection('Background', bgFlex));
 
-                const textSection = createSection('Text Color');
                 const textFlex = document.createElement('div');
                 textFlex.className = 'flex gap-5 flex-wrap';
                 Object.entries(DATASET.text_colors).forEach(([name, hex]) => {
@@ -342,34 +321,24 @@
                     btn.onclick = () => { preferences.text_color = name; renderTabContent(); renderText(); };
                     textFlex.appendChild(btn);
                 });
-                textSection.appendChild(textFlex);
-                wrapper.appendChild(textSection);
+                wrapper.appendChild(createSection('Text Color', textFlex));
             } else if (activeTab === 'highlights') {
-                const globalSection = createSection('Global Modes');
                 const globalGrid = document.createElement('div');
                 globalGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4';
-                
-                const modes = [
-                    { id: 'vowel_coloring', label: 'Vowel Coloring' },
-                    { id: 'first_letter_bold', label: 'Bold Starts' }
-                ];
-                
-                modes.forEach(mode => {
-                    const btn = document.createElement('button');
+                [{ id: 'vowel_coloring', label: 'Vowel Coloring' }, { id: 'first_letter_bold', label: 'Bold Starts' }].forEach(mode => {
                     const isActive = preferences.active_highlights.includes(mode.id);
+                    const btn = document.createElement('button');
                     btn.className = `p-5 rounded-2xl text-sm font-black border-2 flex items-center justify-between transition-all ${isActive ? 'bg-blue-600 text-white border-blue-400 shadow-xl' : 'bg-slate-50 border-slate-100 text-slate-500'}`;
                     btn.innerHTML = `<span>${mode.label}</span>${isActive ? '<i data-lucide="check" class="w-5 h-5"></i>' : ''}`;
                     btn.onclick = () => {
                         if(isActive) preferences.active_highlights = preferences.active_highlights.filter(i => i !== mode.id);
                         else preferences.active_highlights.push(mode.id);
-                        renderTabContent(); renderText(); lucide.createIcons();
+                        renderTabContent(); renderText();
                     };
                     globalGrid.appendChild(btn);
                 });
-                globalSection.appendChild(globalGrid);
-                wrapper.appendChild(globalSection);
+                wrapper.appendChild(createSection('Global Modes', globalGrid));
 
-                const pairsSection = createSection('Specific Letter Pairs');
                 const pairsGrid = document.createElement('div');
                 pairsGrid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-3';
                 Object.entries(DATASET.confusing_letter_groups).forEach(([groupId, letters]) => {
@@ -382,29 +351,32 @@
                     btn.onclick = () => {
                         if(isActive) preferences.active_confusing_groups = preferences.active_confusing_groups.filter(i => i !== groupId);
                         else preferences.active_confusing_groups.push(groupId);
-                        renderTabContent(); renderText(); lucide.createIcons();
+                        renderTabContent(); renderText();
                     };
                     pairsGrid.appendChild(btn);
                 });
-                pairsSection.appendChild(pairsGrid);
-                wrapper.appendChild(pairsSection);
+                wrapper.appendChild(createSection('Specific Letter Pairs', pairsGrid));
             }
 
             tabContentContainer.appendChild(wrapper);
             lucide.createIcons();
         }
 
-        function createSection(title) {
+        function createSection(title, contentEl) {
             const section = document.createElement('section');
             const label = document.createElement('label');
             label.className = 'block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4';
             label.textContent = title;
             section.appendChild(label);
+            section.appendChild(contentEl);
             return section;
         }
 
         function createSlider(title, min, max, step, val, onChange) {
-            const section = createSection(title);
+            const container = document.createElement('div');
+            const label = document.createElement('label');
+            label.className = 'block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4';
+            label.textContent = title;
             const input = document.createElement('input');
             input.type = 'range';
             input.min = min;
@@ -413,101 +385,136 @@
             input.value = val;
             input.className = 'slider';
             input.oninput = (e) => onChange(parseFloat(e.target.value));
-            section.appendChild(input);
-            return section;
+            container.appendChild(label);
+            container.appendChild(input);
+            return container;
         }
 
-        function showStatus(msg) {
+        function setAiLoading(loading, msg = "") {
+            aiLoader.classList.toggle('hidden', !loading);
             statusSpan.textContent = msg;
-            setTimeout(() => statusSpan.textContent = '', 2000);
         }
 
-        // Event Listeners
-        document.getElementById('settings-trigger').onclick = () => {
-            drawerOverlay.classList.remove('hidden');
-            setTimeout(() => drawerOverlay.classList.remove('opacity-0'), 10);
-            prefDrawer.classList.remove('translate-y-full');
-        };
-
-        drawerOverlay.onclick = document.getElementById('close-drawer-handle').onclick = () => {
-            drawerOverlay.classList.add('opacity-0');
-            setTimeout(() => drawerOverlay.classList.add('hidden'), 300);
-            prefDrawer.classList.add('translate-y-full');
-        };
-
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.onclick = () => switchTab(btn.dataset.tab);
-        });
-
-        document.getElementById('reset-btn').onclick = () => {
-            preferences = { ...DEFAULT_PREFS };
-            preferences.active_highlights = [...DEFAULT_PREFS.active_highlights];
-            preferences.active_confusing_groups = [...DEFAULT_PREFS.active_confusing_groups];
-            renderTabContent(); renderText();
-            showStatus('Preferences reset.');
-        };
-
-        textInput.oninput = (e) => {
-            inputText = e.target.value || "CLARIVA **\n\nSuccess is simple. Do your best.";
-            renderText();
-        };
-
-        document.getElementById('talk-trigger').onclick = () => {
-            talkModal.classList.remove('hidden');
-            setTimeout(() => {
-                talkModalContent.classList.remove('scale-95', 'opacity-0');
-            }, 10);
-        };
-
-        document.getElementById('close-talk-modal').onclick = talkModal.onclick = () => {
-            talkModalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => talkModal.classList.add('hidden'), 300);
-        };
-
+        // Actions
         document.getElementById('save-btn').onclick = () => {
             const bgColor = DATASET.background_colors[preferences.background_color];
             const textColor = DATASET.text_colors[preferences.text_color];
             const content = formattedContent.innerHTML;
 
-            const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-                <head>
-                    <title>CLARIVA Document</title>
-                    <style>
-                        body { 
-                            background-color: ${bgColor}; 
-                            color: ${textColor}; 
-                            font-family: '${preferences.font}', sans-serif;
-                            font-size: ${preferences.font_size}px;
-                            line-height: ${preferences.line_spacing};
-                            letter-spacing: ${preferences.letter_spacing}em;
-                            word-spacing: ${preferences.word_spacing}em;
-                            padding: 40px;
-                            white-space: pre-wrap;
-                        }
-                    </style>
-                </head>
-                <body>${content}</body>
-            </html>`;
-
-            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const htmlContentParts = [
+                '<!DOCTYPE html>',
+                '<html>',
+                '<head>',
+                '<title>CLARIVA Document</title>',
+                '<style>',
+                `body { background-color: ${bgColor}; color: ${textColor}; font-family: '${preferences.font}', sans-serif; font-size: ${preferences.font_size}px; line-height: ${preferences.line_spacing}; letter-spacing: ${preferences.letter_spacing}em; word-spacing: ${preferences.word_spacing}em; padding: 40px; white-space: pre-wrap; margin: 0; }`,
+                '</style>',
+                '</head>',
+                `<body>${content}</body>`,
+                '</html>'
+            ];
+            
+            const blob = new Blob([htmlContentParts.join('\n')], { type: 'text/html' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = 'CLARIVA_Formatted.html';
             link.click();
-            showStatus('Saved to Downloads');
+            statusSpan.textContent = "Saved to Downloads";
+            setTimeout(() => statusSpan.textContent = '', 2000);
         };
 
+        document.getElementById('tts-btn').onclick = async () => {
+            setAiLoading(true, "Generating voice...");
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: inputText }] }],
+                        generationConfig: {
+                            responseModalities: ["AUDIO"],
+                            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } }
+                        }
+                    })
+                });
+                const result = await response.json();
+                const audioData = result.candidates[0].content.parts[0].inlineData.data;
+                const audio = new Audio(URL.createObjectURL(new Blob([Uint8Array.from(atob(audioData), c => c.charCodeAt(0))], { type: 'audio/wav' })));
+                audio.play();
+            } finally { setAiLoading(false); }
+        };
+
+        // Modal/Drawer logic
+        document.getElementById('settings-trigger').onclick = () => {
+            drawerOverlay.classList.remove('hidden');
+            setTimeout(() => drawerOverlay.classList.remove('opacity-0'), 10);
+            prefDrawer.classList.remove('translate-y-full');
+        };
+        drawerOverlay.onclick = document.getElementById('close-drawer-handle').onclick = () => {
+            drawerOverlay.classList.add('opacity-0');
+            setTimeout(() => drawerOverlay.classList.add('hidden'), 300);
+            prefDrawer.classList.add('translate-y-full');
+        };
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => switchTab(btn.dataset.tab);
+        });
+        document.getElementById('reset-btn').onclick = () => {
+            preferences = JSON.parse(JSON.stringify(DEFAULT_PREFS));
+            renderTabContent(); renderText();
+        };
+        textInput.oninput = (e) => {
+            inputText = e.target.value || "CLARIVA **";
+            renderText();
+        };
+        document.getElementById('talk-trigger').onclick = () => {
+            talkModal.classList.remove('hidden');
+            setTimeout(() => talkModalContent.classList.remove('scale-95', 'opacity-0'), 10);
+        };
+        document.getElementById('close-talk-modal').onclick = () => {
+            talkModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => talkModal.classList.add('hidden'), 300);
+        };
+
+        // File/Image triggers
+        document.getElementById('camera-trigger').onclick = () => document.getElementById('image-input').click();
+        document.getElementById('gallery-trigger').onclick = () => document.getElementById('image-input').click();
+        document.getElementById('image-input').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                setAiLoading(true, "Scanning image...");
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: "Extract text from this image exactly." },
+                                    { inlineData: { mimeType: "image/png", data: ev.target.result.split(',')[1] } }
+                                ]
+                            }]
+                        })
+                    });
+                    const data = await response.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        inputText = text;
+                        textInput.value = text;
+                        renderText();
+                    }
+                } finally { setAiLoading(false); }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // Share
         document.getElementById('share-btn').onclick = () => {
-            if(navigator.share) {
-                navigator.share({ title: 'CLARIVA', text: inputText });
-            } else {
-                showStatus('Share not supported');
-            }
+            if(navigator.share) navigator.share({ title: 'CLARIVA', text: inputText });
         };
 
-        // Initialize
+        // Init
         textInput.value = inputText;
         renderText();
         renderTabContent();
