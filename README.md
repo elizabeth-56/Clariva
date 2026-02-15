@@ -1,2 +1,2 @@
 # Clariva
-Dyslexia Friendly Reader
+Clarity of Words
