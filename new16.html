@@ -84,20 +84,6 @@ height:100%;
 object-fit:cover;
 }
 
-/* WELCOME SCREEN */
-#welcome{
-position:absolute;
-inset:0;
-background:#E6F0FA;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:3.5rem;
-font-weight:700;
-opacity:0;
-pointer-events:none;
-}
-
 /* ANIMATIONS */
 @keyframes letters{
 to{opacity:1;transform:translateY(0)}
@@ -107,11 +93,6 @@ to{opacity:1;transform:translateY(0)}
 to{opacity:1}
 }
 
-.show{
-opacity:1 !important;
-pointer-events:auto !important;
-transition:1s;
-}
 
 @media(max-width:900px){
 .container{flex-direction:column}
@@ -141,7 +122,7 @@ transition:1s;
 
 </div>
 
-<div id="welcome">Welcome</div>
+
 
 <script>
 const video = document.getElementById("introVideo");
@@ -152,12 +133,12 @@ video.addEventListener("loadedmetadata", () => {
   video.playbackRate = duration / 5;
 });
 
-/* After 5 seconds → go to welcome screen */
 setTimeout(() => {
-  document.getElementById("main").style.display = "none";
-  document.getElementById("welcome").classList.add("show");
+  window.location.href = "i3.html"; // go directly to scroll page
 }, 5000);
+
 </script>
+
 
 </body>
 </html>
